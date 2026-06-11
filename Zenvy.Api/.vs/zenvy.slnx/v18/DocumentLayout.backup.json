@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\zenvy\\Zenvy.Api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E2054DE1-3912-86C9-CD74-688C845B2014}|zenvy.infrastructure\\zenvy.infrastructure.csproj|d:\\zenvy\\zenvy.api\\zenvy.infrastructure\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2054DE1-3912-86C9-CD74-688C845B2014}|zenvy.infrastructure\\zenvy.infrastructure.csproj|solutionrelative:zenvy.infrastructure\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30BB2D08-AD81-6497-EE88-EA6D8FF8D1CB}|zenvy.application\\zenvy.application.csproj|d:\\zenvy\\zenvy.api\\zenvy.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{30BB2D08-AD81-6497-EE88-EA6D8FF8D1CB}|zenvy.application\\zenvy.application.csproj|solutionrelative:zenvy.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2054DE1-3912-86C9-CD74-688C845B2014}|zenvy.infrastructure\\zenvy.infrastructure.csproj|d:\\zenvy\\zenvy.api\\zenvy.infrastructure\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2054DE1-3912-86C9-CD74-688C845B2014}|zenvy.infrastructure\\zenvy.infrastructure.csproj|solutionrelative:zenvy.infrastructure\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\zenvy\\Zenvy.Api\\zenvy.Application\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "zenvy.Application\\Services\\AuthService.cs",
+              "ToolTip": "D:\\zenvy\\Zenvy.Api\\zenvy.Application\\Services\\AuthService.cs",
+              "RelativeToolTip": "zenvy.Application\\Services\\AuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T19:35:22.228Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "JwtService.cs",
+              "DocumentMoniker": "D:\\zenvy\\Zenvy.Api\\zenvy.Infrastructure\\Services\\JwtService.cs",
+              "RelativeDocumentMoniker": "zenvy.Infrastructure\\Services\\JwtService.cs",
+              "ToolTip": "D:\\zenvy\\Zenvy.Api\\zenvy.Infrastructure\\Services\\JwtService.cs*",
+              "RelativeToolTip": "zenvy.Infrastructure\\Services\\JwtService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T19:33:10.92Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "D:\\zenvy\\Zenvy.Api\\zenvy.Infrastructure\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "zenvy.Infrastructure\\DependencyInjection.cs",
+              "ToolTip": "D:\\zenvy\\Zenvy.Api\\zenvy.Infrastructure\\DependencyInjection.cs",
+              "RelativeToolTip": "zenvy.Infrastructure\\DependencyInjection.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABcAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T12:33:56.221Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

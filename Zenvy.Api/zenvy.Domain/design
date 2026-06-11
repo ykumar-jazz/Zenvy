@@ -1,0 +1,46 @@
+ClothingManagement.Domain
+│
+├── Entities
+│   │
+│   ├── User.cs
+│   ├── Role.cs
+│   │
+│   ├── Product.cs
+│   ├── ProductVariant.cs
+│   ├── ProductImage.cs
+│   ├── Price.cs
+│   │
+│   ├── Category.cs
+│   ├── Brand.cs
+│   │
+│   ├── Supplier.cs
+│   ├── Customer.cs
+│   │
+│   ├── PurchaseOrder.cs
+│   ├── PurchaseOrderLine.cs
+│   │
+│   ├── SalesOrder.cs
+│   ├── SalesOrderLine.cs
+│   │
+│   ├── Shipment.cs
+│   ├── Payment.cs
+│   │
+│   ├── Warehouse.cs
+│   ├── Inventory.cs
+│   ├── InventoryTransaction.cs
+│   │
+│   ├── Expense.cs
+│   ├── ExpenseType.cs
+│   │
+│   ├── Investor.cs
+│   ├── InvestorTransaction.cs
+│   ├── ProfitDistribution.cs
+│   │
+│   ├── MarketplaceSettlement.cs
+│   └── EmployeeCommission.cs
+│
+├── Enums
+│
+├── Constants
+│
+└── Common

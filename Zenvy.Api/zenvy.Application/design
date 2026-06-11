@@ -1,0 +1,36 @@
+ClothingManagement.Application
+│
+├── Interfaces
+│   │
+│   ├── IRepository.cs
+│   ├── IUnitOfWork.cs
+│   │
+│   ├── IAuthService.cs
+│   ├── IProductService.cs
+│   ├── ISalesService.cs
+│   ├── IPurchaseService.cs
+│   └── IInventoryService.cs
+│
+├── DTOs
+│
+│   ├── Auth
+│   ├── Product
+│   ├── Purchase
+│   ├── Sales
+│   ├── Inventory
+│   ├── Dashboard
+│
+├── Features
+│
+│   ├── Auth
+│   ├── Products
+│   ├── Inventory
+│   ├── Purchases
+│   ├── Sales
+│   ├── Expenses
+│   ├── Investors
+│   └── Dashboard
+│
+├── Validators
+│
+└── Mappings

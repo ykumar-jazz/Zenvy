@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="zenvy.api/zenvy.api.csproj" />
+  <Project Path="zenvy.application/zenvy.application.csproj" />
+  <Project Path="zenvy.domain/zenvy.domain.csproj" />
+  <Project Path="zenvy.infrastructure/zenvy.infrastructure.csproj" />
+  <Project Path="zenvy.shared/zenvy.shared.csproj" />
+</Solution>

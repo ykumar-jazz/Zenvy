@@ -1,0 +1,6 @@
+@zenvy.api_HostAddress = http://localhost:5108
+
+GET {{zenvy.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,31 @@
+ClothingManagement.Infrastructure
+│
+├── Persistence
+│   │
+│   ├── AppDbContext.cs
+│   │
+│   ├── Configurations
+│   │   ├── UserConfig.cs
+│   │   ├── ProductConfig.cs
+│   │   ├── SalesOrderConfig.cs
+│   │   └── ...
+│   │
+│   ├── Migrations
+│   │
+│   ├── Repositories
+│   │
+│   └── UnitOfWork
+│
+├── Services
+│   │
+│   ├── JwtService.cs
+│   ├── FileService.cs
+│   ├── InventoryService.cs
+│   ├── ProfitService.cs
+│   └── CommissionService.cs
+│
+├── Identity
+│
+└── DependencyInjection.cs
+
+
