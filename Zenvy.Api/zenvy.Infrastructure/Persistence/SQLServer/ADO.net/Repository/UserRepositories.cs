@@ -204,5 +204,26 @@ namespace zenvy.infrastructure.Persistence.SqlServer.ADO.net.Repository
             }
             return Task.CompletedTask;
         }
+        
+        public Task<bool> ChaangePasswordAsync(Guid userId, string newPasswordHash)
+        {
+            try
+            {
+                using var connection = new SqlConnection(sqlConnectionString);
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Users SET PasswordHash = @PasswordHash WHERE UserId = @UserId";
+                command.Parameters.AddWithValue("@UserId", userId.ToString());
+                command.Parameters.AddWithValue("@PasswordHash", newPasswordHash);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                // Log the exception (not implemented here)
+                Console.WriteLine($"Error changing password: {ex.Message}");
+            }
+            return Task.FromResult(true);
+        }
     }
 }

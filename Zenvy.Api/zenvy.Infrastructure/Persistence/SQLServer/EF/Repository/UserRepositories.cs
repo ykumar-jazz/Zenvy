@@ -8,7 +8,13 @@ namespace zenvy.infrastructure.Persistence.SqlServer.EF.Repository
 {
     internal class EfUserRepositories : IUserRepository
     {
+
         Task IUserRepository.AddAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IUserRepository.ChaangePasswordAsync(Guid userId, string newPasswordHash)
         {
             throw new NotImplementedException();
         }

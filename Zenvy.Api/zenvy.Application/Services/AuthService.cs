@@ -80,5 +80,17 @@ public class AuthService : IAuthService
             Role = user.Role
         };
     }
+    public async Task<bool> ChangePasswordAsync(string userId, ChangePassRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(Guid.Parse(userId)) ?? throw new Exception("User not found");
+        bool passwordValid = BCrypt.Net.BCrypt.Verify(request.OldPassword, user.PasswordHash);
+        if (!passwordValid)
+        {
+            throw new Exception("Current password is incorrect");
+        }
+
+        string newHashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        return await _userRepository.ChaangePasswordAsync(Guid.Parse(userId), newHashedPassword);
+    }
 
 }

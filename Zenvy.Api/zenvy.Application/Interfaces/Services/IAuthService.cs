@@ -6,5 +6,6 @@ namespace zenvy.Application.Auth
     {
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task<UserProfileResponse> GetProfileAsync(string userId);
+        Task<bool> ChangePasswordAsync(string userId, ChangePassRequest request);
     }
 }

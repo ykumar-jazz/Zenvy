@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using zenvy.application.Interfaces.Services;
 using zenvy.application.Service;
+using zenvy.application.Services;
+using zenvy.Application.Auth;
+using zenvy.Application.Interfaces.Services;
+using zenvy.Application.Services;
 
 namespace zenvy.application
 {
@@ -14,9 +18,10 @@ namespace zenvy.application
             this IServiceCollection services)
         {
             services.AddScoped<IUserService,UserService>();
-
-            //services.AddScoped<IAuthService,AuthService>();
-
+            services.AddScoped<ICategoryService,CategoryService>();
+            services.AddScoped<IAuthService,AuthService>();
+            services.AddScoped<IBrandService,BrandService>();
+            services.AddScoped<IProductService,ProductService>();
             return services;
         }
     }

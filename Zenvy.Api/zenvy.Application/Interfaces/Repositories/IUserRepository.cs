@@ -18,5 +18,6 @@ namespace zenvy.application.Interfaces.Repositories
         Task UpdateAsync(User user);
 
         Task DeleteAsync(Guid id);
+        Task<bool> ChaangePasswordAsync(Guid userId, string newPasswordHash);
     }
 }

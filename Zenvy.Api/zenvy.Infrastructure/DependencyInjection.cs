@@ -12,6 +12,10 @@ using zenvy.Application.Auth;
 using zenvy.application.Interfaces;
 using zenvy.application.Interfaces.Services;
 using zenvy.infrastructure.Service;
+using zenvy.Application.Interfaces.Repositories;
+using zenvy.Infrastructure.Persistence.SQLServer.ADO.net.Repository;
+using zenvy.infrastructure.Persistence.SqlServer.ADO;
+using zenvy.infrastructure.persistence.sqlserver.ado.net.repository.products;
 
 namespace zenvy.infrastructure;
 
@@ -54,7 +58,9 @@ public static class DependencyInjection
             // 2. Register ADO repositories as Scoped, passing the request-specific connection string.
             // This guarantees a brand new connection instance is instantiated fresh with every HTTP request!
             services.AddScoped<IUserRepository, UserRepositories>();
-
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IBrandRepository,BrandRepository>();
+            services.AddScoped<IProductsRepository, ProductsRepository>();
             // Ensure your Unit of Work also accepts the string if it opens transactions
             services.AddScoped<IUnitOfWork, AdoUnitOfWork>();
         }
