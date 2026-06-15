@@ -22,6 +22,8 @@ namespace zenvy.application
             services.AddScoped<IAuthService,AuthService>();
             services.AddScoped<IBrandService,BrandService>();
             services.AddScoped<IProductService,ProductService>();
+            services.AddScoped<IWarehouseService,WarehouseService>();
+            services.AddScoped<IInventoryService,InventoryService>();
             return services;
         }
     }

@@ -15,6 +15,7 @@ using zenvy.infrastructure.Service;
 using zenvy.Application.Interfaces.Repositories;
 using zenvy.Infrastructure.Persistence.SQLServer.ADO.net.Repository;
 using zenvy.infrastructure.Persistence.SqlServer.ADO;
+using zenvy.infrastructure.persistence.sqlserver.ado.net.repository;
 using zenvy.infrastructure.persistence.sqlserver.ado.net.repository.products;
 
 namespace zenvy.infrastructure;
@@ -61,6 +62,8 @@ public static class DependencyInjection
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IBrandRepository,BrandRepository>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
             // Ensure your Unit of Work also accepts the string if it opens transactions
             services.AddScoped<IUnitOfWork, AdoUnitOfWork>();
         }
