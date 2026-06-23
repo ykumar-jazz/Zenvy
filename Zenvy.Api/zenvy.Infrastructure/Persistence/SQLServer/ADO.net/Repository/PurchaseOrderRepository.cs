@@ -43,6 +43,7 @@ public class PurchaseOrderRepository(IConfiguration configuration) : IPurchaseOr
             orders.Add(MapHeader(reader));
         }
 
+
         return orders;
     }
 
@@ -61,23 +62,23 @@ public class PurchaseOrderRepository(IConfiguration configuration) : IPurchaseOr
         }
 
         var order = MapHeader(reader);
-        await reader.NextResultAsync();
-        while (await reader.ReadAsync())
-        {
-            order.Lines.Add(new PurchaseOrderLineResponse
-            {
-                POLineId = reader.GetInt64(reader.GetOrdinal("POLineId")),
-                POId = reader.GetInt64(reader.GetOrdinal("POId")),
-                ProductMasterId = reader.GetInt32(reader.GetOrdinal("ProductMasterId")),
-                ProductName = reader.GetString(reader.GetOrdinal("ProductName")),
-                VariantId = reader.GetInt32(reader.GetOrdinal("VariantId")),
-                SKU = reader.GetString(reader.GetOrdinal("SKU")),
-                Qty = reader.GetInt32(reader.GetOrdinal("Qty")),
-                UnitCost = reader.GetDecimal(reader.GetOrdinal("UnitCost")),
-                TaxAmount = reader.GetDecimal(reader.GetOrdinal("TaxAmount")),
-                LineTotal = reader.GetDecimal(reader.GetOrdinal("LineTotal"))
-            });
-        }
+        // await reader.NextResultAsync();
+        // while (await reader.ReadAsync())
+        // {
+        //     order.Lines.Add(new PurchaseOrderLineResponse
+        //     {
+        //         POLineId = reader.GetInt64(reader.GetOrdinal("POLineId")),
+        //         POId = reader.GetInt64(reader.GetOrdinal("POId")),
+        //         ProductMasterId = reader.GetInt32(reader.GetOrdinal("ProductMasterId")),
+        //         ProductName = reader.GetString(reader.GetOrdinal("ProductName")),
+        //         VariantId = reader.GetInt32(reader.GetOrdinal("VariantId")),
+        //         SKU = reader.GetString(reader.GetOrdinal("SKU")),
+        //         Qty = reader.GetInt32(reader.GetOrdinal("Qty")),
+        //         UnitCost = reader.GetDecimal(reader.GetOrdinal("UnitCost")),
+        //         TaxAmount = reader.GetDecimal(reader.GetOrdinal("TaxAmount")),
+        //         LineTotal = reader.GetDecimal(reader.GetOrdinal("LineTotal"))
+        //     });
+        // }
 
         return order;
     }
@@ -103,8 +104,11 @@ public class PurchaseOrderRepository(IConfiguration configuration) : IPurchaseOr
             SubTotal = reader.GetDecimal(reader.GetOrdinal("SubTotal")),
             TaxAmount = reader.GetDecimal(reader.GetOrdinal("TaxAmount")),
             GrandTotal = reader.GetDecimal(reader.GetOrdinal("GrandTotal")),
-            CreatedBy = reader.GetGuid(reader.GetOrdinal("CreatedBy")).ToString(),
-            CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+            CreatedBy = reader.GetString(reader.GetOrdinal("CreatedBy")),
+            CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+            Lines = JsonSerializer.Deserialize<List<PurchaseOrderLineResponse>>(
+                reader["LinesJson"]?.ToString() ?? "[]"
+                ) ?? []
         };
     }
 }

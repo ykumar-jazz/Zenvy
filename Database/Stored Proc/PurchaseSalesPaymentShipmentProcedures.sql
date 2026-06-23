@@ -19,15 +19,15 @@ BEGIN
 END;
 GO
 
-CREATE OR ALTER PROCEDURE dbo.usp_GetSuppliers
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-     SELECT s.SupplierId, s.Name, s.ContactPerson, s.Phone, s.Email, addr.AddressLine1, s.Status, s.CreatedAt  
-    FROM Suppliers s inner join SupplierAddress addr on s.AddressId=addr.AddressId  
-    ORDER BY s.SupplierId DESC; 
-END;
+CREATE or alter  PROCEDURE dbo.usp_GetSuppliers  
+AS  
+BEGIN  
+    SET NOCOUNT ON;  
+  
+     SELECT s.SupplierId, s.Name, s.ContactPerson, s.Phone, s.Email, concat(addr.AddressLine1,addr.AddressLine2) as address, s.Status, s.CreatedAt    
+    FROM Suppliers s inner join SupplierAddress addr on s.AddressId=addr.AddressId    
+    ORDER BY s.SupplierId DESC;   
+END;  
 GO
 
 CREATE OR ALTER PROCEDURE dbo.usp_CreateCustomer
@@ -174,15 +174,42 @@ BEGIN
         po.TaxAmount,
         po.GrandTotal,
         po.CreatedBy,
-        po.CreatedAt
+        po.CreatedAt,
+
+        ISNULL(
+        (
+            SELECT
+                pol.POLineId,
+                pol.POId,
+                pm.ProductMasterId,
+                pm.ProductName,
+                pv.VariantId,
+                pv.SKU,
+                pol.Qty,
+                pol.UnitCost,
+                pol.TaxAmount,
+                CAST(pol.LineTotal AS DECIMAL(18,2)) AS LineTotal
+            FROM PurchaseOrderLines pol
+            INNER JOIN ProductVariants pv
+                ON pol.VariantId = pv.VariantId
+            INNER JOIN ProductMasters pm
+                ON pv.ProductMasterId = pm.ProductMasterId
+            WHERE pol.POId = po.POId
+            FOR JSON PATH
+        ), '[]') AS LinesJson
+
     FROM PurchaseOrders po
-    INNER JOIN Suppliers s ON s.SupplierId = po.SupplierId
-    INNER JOIN Warehouses w ON w.WarehouseId = po.WarehouseId
+    INNER JOIN Suppliers s
+        ON s.SupplierId = po.SupplierId
+    INNER JOIN Warehouses w
+        ON w.WarehouseId = po.WarehouseId
     ORDER BY po.POId DESC;
-END;
+END
 GO
 
-CREATE OR ALTER PROCEDURE dbo.usp_GetPurchaseOrderById
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetPurchaseOrderById 
     @POId BIGINT
 AS
 BEGIN
@@ -202,28 +229,31 @@ BEGIN
         po.TaxAmount,
         po.GrandTotal,
         po.CreatedBy,
-        po.CreatedAt
+        po.CreatedAt,
+        ISNULL(
+        (
+            SELECT
+            pol.POLineId,
+            pol.POId,
+            pm.ProductMasterId,
+            pm.ProductName,
+            pol.VariantId,
+            pv.SKU,
+            pol.Qty,
+            pol.UnitCost,
+            pol.TaxAmount,
+            CAST(pol.LineTotal AS DECIMAL(18,2)) AS LineTotal
+            FROM PurchaseOrderLines pol
+            INNER JOIN ProductVariants pv ON pv.VariantId = pol.VariantId
+            INNER JOIN ProductMasters pm ON pm.ProductMasterId = pv.ProductMasterId
+            WHERE pol.POId = @POId
+            ORDER BY pol.POLineId
+             FOR JSON PATH
+          ), '[]') AS LinesJson
     FROM PurchaseOrders po
     INNER JOIN Suppliers s ON s.SupplierId = po.SupplierId
     INNER JOIN Warehouses w ON w.WarehouseId = po.WarehouseId
-    WHERE po.POId = @POId;
-
-    SELECT
-        pol.POLineId,
-        pol.POId,
-        pm.ProductMasterId,
-        pm.ProductName,
-        pol.VariantId,
-        pv.SKU,
-        pol.Qty,
-        pol.UnitCost,
-        pol.TaxAmount,
-        CAST(pol.LineTotal AS DECIMAL(18,2)) AS LineTotal
-    FROM PurchaseOrderLines pol
-    INNER JOIN ProductVariants pv ON pv.VariantId = pol.VariantId
-    INNER JOIN ProductMasters pm ON pm.ProductMasterId = pv.ProductMasterId
-    WHERE pol.POId = @POId
-    ORDER BY pol.POLineId;
+    WHERE po.POId = @POId
 END;
 GO
 

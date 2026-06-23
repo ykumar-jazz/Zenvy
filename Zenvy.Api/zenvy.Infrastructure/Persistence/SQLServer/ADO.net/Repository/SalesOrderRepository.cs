@@ -97,7 +97,7 @@ public class SalesOrderRepository(IConfiguration configuration) : ISalesOrderRep
             CustomerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? null : reader.GetString(reader.GetOrdinal("CustomerName")),
             ChannelId = reader.GetInt32(reader.GetOrdinal("ChannelId")),
             ChannelName = reader.GetString(reader.GetOrdinal("ChannelName")),
-            CreatedBy = reader.GetGuid(reader.GetOrdinal("CreatedBy")).ToString(),
+            CreatedBy = reader.GetString(reader.GetOrdinal("CreatedBy")).ToString(),
             ExternalOrderId = reader.IsDBNull(reader.GetOrdinal("ExternalOrderId")) ? null : reader.GetString(reader.GetOrdinal("ExternalOrderId")),
             OrderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
             Status = reader.GetString(reader.GetOrdinal("Status")),

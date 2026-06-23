@@ -129,7 +129,7 @@ public class ReturnRepository(IConfiguration configuration) : IReturnRepository
             ReturnShippingFee = reader.GetDecimal(reader.GetOrdinal("ReturnShippingFee")),
             MarketplaceFee = reader.GetDecimal(reader.GetOrdinal("MarketplaceFee")),
             DeliveryFeeRefunded = reader.GetBoolean(reader.GetOrdinal("DeliveryFeeRefunded")),
-            CreatedBy = reader.IsDBNull(reader.GetOrdinal("CreatedBy")) ? null : reader.GetGuid(reader.GetOrdinal("CreatedBy")).ToString(),
+            CreatedBy = reader.IsDBNull(reader.GetOrdinal("CreatedBy")) ? null : reader.GetString(reader.GetOrdinal("CreatedBy")).ToString(),
             Notes = reader.IsDBNull(reader.GetOrdinal("Notes")) ? null : reader.GetString(reader.GetOrdinal("Notes")),
             CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
         };

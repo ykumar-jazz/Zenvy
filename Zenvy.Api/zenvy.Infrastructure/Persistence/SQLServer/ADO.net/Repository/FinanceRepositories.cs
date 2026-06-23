@@ -88,7 +88,7 @@ public class ExpenseRepository(IConfiguration configuration) : IExpenseRepositor
             Amount = reader.GetDecimal(reader.GetOrdinal("Amount")),
             Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
             ExpenseDate = reader.GetDateTime(reader.GetOrdinal("ExpenseDate")),
-            CreatedBy = reader.GetGuid(reader.GetOrdinal("CreatedBy")).ToString(),
+            CreatedBy = reader.GetString(reader.GetOrdinal("CreatedBy")).ToString(),
             CreatedByName = reader.GetString(reader.GetOrdinal("CreatedByName"))
         });
         return result;
@@ -146,7 +146,7 @@ public class EmployeeCommissionRepository(IConfiguration configuration) : IEmplo
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync()) result.Add(new EmployeeCommissionResponse
         {
-            CommissionId = reader.GetInt64(reader.GetOrdinal("CommissionId")), UserId = reader.GetGuid(reader.GetOrdinal("UserId")).ToString(),
+            CommissionId = reader.GetInt64(reader.GetOrdinal("CommissionId")), UserId = reader.GetString(reader.GetOrdinal("UserId")).ToString(),
             EmployeeName = reader.GetString(reader.GetOrdinal("EmployeeName")), OrderId = reader.GetInt64(reader.GetOrdinal("OrderId")),
             OrderAmount = reader.GetDecimal(reader.GetOrdinal("OrderAmount")), CommissionPercent = reader.GetDecimal(reader.GetOrdinal("CommissionPercent")),
             CommissionAmount = reader.GetDecimal(reader.GetOrdinal("CommissionAmount")), CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
