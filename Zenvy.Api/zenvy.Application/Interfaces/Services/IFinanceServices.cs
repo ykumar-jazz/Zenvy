@@ -29,8 +29,3 @@ public interface IInvestorService
     Task<int> DistributeProfitAsync(ProfitDistributionRequest request);
     Task<IEnumerable<ProfitDistributionResponse>> GetDistributionsAsync(short? year, byte? month, int? investorId);
 }
-
-public interface IDashboardService
-{
-    Task<DashboardResponse> GetSummaryAsync(DateTime fromDate, DateTime toDate, int lowStockThreshold);
-}

@@ -523,6 +523,212 @@ BEGIN
 END;
 GO
 
+CREATE OR ALTER PROCEDURE dbo.usp_GetSalesChannels
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        ChannelId,
+        ChannelName,
+        ChannelType,
+        Status
+    FROM SalesChannels
+    ORDER BY ChannelName;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetSalesChannelById
+    @ChannelId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        ChannelId,
+        ChannelName,
+        ChannelType,
+        Status
+    FROM SalesChannels
+    WHERE ChannelId = @ChannelId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_CreateSalesChannel
+    @ChannelName NVARCHAR(100),
+    @ChannelType NVARCHAR(50) = NULL,
+    @Status BIT = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF LEN(ISNULL(@ChannelName, '')) = 0
+        THROW 50160, 'Channel name is required.', 1;
+
+    INSERT INTO SalesChannels (ChannelName, ChannelType, Status)
+    VALUES (@ChannelName, @ChannelType, @Status);
+
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS ChannelId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_UpdateSalesChannel
+    @ChannelId INT,
+    @ChannelName NVARCHAR(100),
+    @ChannelType NVARCHAR(50) = NULL,
+    @Status BIT = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM SalesChannels WHERE ChannelId = @ChannelId)
+        THROW 50161, 'Sales channel not found.', 1;
+
+    UPDATE SalesChannels
+    SET ChannelName = @ChannelName,
+        ChannelType = @ChannelType,
+        Status = @Status
+    WHERE ChannelId = @ChannelId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_DeleteSalesChannel
+    @ChannelId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM SalesChannels WHERE ChannelId = @ChannelId)
+        THROW 50162, 'Sales channel not found.', 1;
+
+    DELETE FROM SalesChannels
+    WHERE ChannelId = @ChannelId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_CreateMarketplaceSettlement
+    @OrderId BIGINT,
+    @ChannelId INT,
+    @SaleAmount DECIMAL(18,2),
+    @MarketplaceCommission DECIMAL(18,2),
+    @ShippingCharge DECIMAL(18,2) = 0,
+    @TaxDeduction DECIMAL(18,2) = 0,
+    @Status NVARCHAR(50) = 'PENDING',
+    @SettlementDate DATETIME2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM SalesOrders WHERE OrderId = @OrderId)
+        THROW 50150, 'Sales order not found.', 1;
+
+    IF NOT EXISTS (SELECT 1 FROM SalesChannels WHERE ChannelId = @ChannelId)
+        THROW 50151, 'Sales channel not found.', 1;
+
+    DECLARE @OrderChannelId INT;
+    SELECT @OrderChannelId = ChannelId FROM SalesOrders WHERE OrderId = @OrderId;
+
+    IF @OrderChannelId <> @ChannelId
+        THROW 50152, 'Marketplace settlement channel does not match the sales order channel.', 1;
+
+    DECLARE @NetReceived DECIMAL(18,2) =
+        @SaleAmount
+        - @MarketplaceCommission
+        - @ShippingCharge
+        - @TaxDeduction;
+
+    IF @NetReceived < 0
+        THROW 50153, 'Marketplace settlement net amount cannot be negative.', 1;
+
+    INSERT INTO MarketplaceSettlements
+    (
+        OrderId,
+        ChannelId,
+        SaleAmount,
+        MarketplaceCommission,
+        ShippingCharge,
+        TaxDeduction,
+        NetReceived,
+        SettlementDate,
+        Status
+    )
+    VALUES
+    (
+        @OrderId,
+        @ChannelId,
+        @SaleAmount,
+        @MarketplaceCommission,
+        @ShippingCharge,
+        @TaxDeduction,
+        @NetReceived,
+        ISNULL(@SettlementDate, GETDATE()),
+        @Status
+    );
+
+    SELECT CAST(SCOPE_IDENTITY() AS BIGINT) AS SettlementId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetMarketplaceSettlements
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        ms.SettlementId,
+        ms.OrderId,
+        so.ExternalOrderId,
+        so.OrderDate,
+        so.GrandTotal AS OrderGrandTotal,
+        ms.ChannelId,
+        sc.ChannelName,
+        cust.Name AS CustomerName,
+        ms.SaleAmount,
+        ms.MarketplaceCommission,
+        ms.ShippingCharge,
+        ms.TaxDeduction,
+        ms.NetReceived,
+        ms.SettlementDate,
+        ms.Status
+    FROM MarketplaceSettlements ms
+    INNER JOIN SalesOrders so ON so.OrderId = ms.OrderId
+    INNER JOIN SalesChannels sc ON sc.ChannelId = ms.ChannelId
+    LEFT JOIN Customers cust ON cust.CustomerId = so.CustomerId
+    ORDER BY ms.SettlementDate DESC, ms.SettlementId DESC;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetMarketplaceSettlementById
+    @SettlementId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        ms.SettlementId,
+        ms.OrderId,
+        so.ExternalOrderId,
+        so.OrderDate,
+        so.GrandTotal AS OrderGrandTotal,
+        ms.ChannelId,
+        sc.ChannelName,
+        cust.Name AS CustomerName,
+        ms.SaleAmount,
+        ms.MarketplaceCommission,
+        ms.ShippingCharge,
+        ms.TaxDeduction,
+        ms.NetReceived,
+        ms.SettlementDate,
+        ms.Status
+    FROM MarketplaceSettlements ms
+    INNER JOIN SalesOrders so ON so.OrderId = ms.OrderId
+    INNER JOIN SalesChannels sc ON sc.ChannelId = ms.ChannelId
+    LEFT JOIN Customers cust ON cust.CustomerId = so.CustomerId
+    WHERE ms.SettlementId = @SettlementId;
+END;
+GO
+
 IF COL_LENGTH('SalesReturns', 'RefundStatus') IS NULL
     ALTER TABLE SalesReturns ADD RefundStatus NVARCHAR(50) NOT NULL CONSTRAINT DF_SalesReturns_RefundStatus DEFAULT 'PENDING';
 GO
@@ -712,6 +918,157 @@ BEGIN
         (@OrderId, @ReturnDate, @Reason, @Status, @RefundStatus, @RefundMethod, @RefundAmount, @ReturnShippingFee, @MarketplaceFee, @DeliveryFeeRefunded, @CreatedBy, @Notes);
 
     SET @ReturnId = SCOPE_IDENTITY();
+
+-- =============================================
+-- DASHBOARD ANALYTICS STORED PROCEDURES
+-- =============================================
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetExecutiveDashboard
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @TodayStart DATETIME2 = CAST(GETDATE() AS DATE);
+    DECLARE @TodayEnd DATETIME2 = CAST(GETDATE() AS DATE) + CAST('23:59:59.9999999' AS TIME(7));
+    DECLARE @MonthStart DATETIME2 = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
+    DECLARE @MonthEnd DATETIME2 = EOMONTH(GETDATE());
+
+    SELECT 
+        ISNULL(SUM(CASE WHEN so.OrderDate BETWEEN @TodayStart AND @TodayEnd THEN so.GrandTotal ELSE 0 END), 0) AS TodaysSales,
+        ISNULL(SUM(CASE WHEN so.OrderDate BETWEEN @MonthStart AND @MonthEnd THEN so.GrandTotal ELSE 0 END), 0) AS MonthlySales,
+        ISNULL(SUM(CASE WHEN so.OrderDate BETWEEN @MonthStart AND @MonthEnd THEN (so.GrandTotal - ISNULL((SELECT SUM(Qty * UnitPrice) FROM SalesOrderLines WHERE OrderId = so.OrderId), 0)) ELSE 0 END), 0) AS MonthlyProfit,
+        ISNULL(SUM(il.Qty * pm.CostPrice), 0) AS InventoryValue,
+        0 AS AvailableCash,
+        0 AS ReserveFund,
+        ISNULL(SUM(inv.InvestmentAmount), 0) AS InvestorLiability,
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status IN ('PENDING', 'PROCESSING')) AS PendingOrders,
+        (SELECT COUNT(*) FROM SalesReturns WHERE Status = 'REQUESTED') AS PendingReturns
+    FROM SalesOrders so
+    INNER JOIN SalesOrderLines sol ON so.OrderId = sol.OrderId
+    LEFT JOIN InventoryLedger il ON il.VariantId = sol.VariantId
+    LEFT JOIN ProductVariants pv ON pv.VariantId = il.VariantId
+    LEFT JOIN ProductMaster pm ON pm.ProductId = pv.ProductId
+    LEFT JOIN Investors inv ON inv.IsActive = 1;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetFinanceDashboard
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        0 AS CashAvailable,
+        0 AS BankBalance,
+        0 AS WorkingCapital,
+        0 AS ReserveFund,
+        ISNULL(SUM(i.InvestmentAmount), 0) AS InvestorCapital,
+        0 AS OutstandingLoans,
+        ISNULL(SUM(so.GrandTotal), 0) AS Receivables,
+        ISNULL(SUM(po.PurchaseOrderTotal), 0) AS Payables
+    FROM Investors i
+    FULL OUTER JOIN SalesOrders so ON so.OrderId IS NOT NULL
+    FULL OUTER JOIN PurchaseOrders po ON po.PurchaseOrderId IS NOT NULL;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetOperationsDashboard
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        (SELECT COUNT(*) FROM PurchaseOrders WHERE Status = 'PENDING') AS PendingPurchases,
+        0 AS PendingGoodsReceipt,
+        ISNULL(SUM(il.Qty), 0) AS CurrentInventory,
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status IN ('PENDING', 'PROCESSING')) AS PendingOrders,
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status = 'PACKED') AS PendingDispatch,
+        (SELECT COUNT(*) FROM SalesReturns WHERE Status = 'REQUESTED') AS Returns,
+        0 AS DamagedStock
+    FROM InventoryLedger il;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetMarketplaceDashboard
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status IS NOT NULL) AS TotalOrders,
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status = 'DELIVERED') AS DeliveredOrders,
+        (SELECT COUNT(*) FROM SalesOrders WHERE Status = 'CANCELLED') AS CancelledOrders,
+        (SELECT COUNT(*) FROM SalesReturns WHERE Status != 'REJECTED') AS ReturnedOrders,
+        (SELECT COUNT(*) FROM MarketplaceSettlements WHERE Status = 'PENDING') AS SettlementPending,
+        ISNULL(SUM(CASE WHEN ms.Status = 'SETTLED' THEN ms.NetReceived ELSE 0 END), 0) AS SettlementReceived
+    FROM MarketplaceSettlements ms;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetInvestorDashboard
+    @InvestorId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        i.InvestorId,
+        i.Name,
+        ISNULL(SUM(inv.InvestmentAmount), 0) AS TotalInvested,
+        ISNULL(SUM(inv.InvestmentAmount), 0) AS CurrentCapital,
+        0 AS ProfitEarned,
+        0 AS ProfitPaid,
+        0 AS PendingProfit,
+        0 AS RoiPercent
+    FROM Investors i
+    LEFT JOIN Investments inv ON i.InvestorId = inv.InvestorId
+    WHERE i.InvestorId = @InvestorId
+    GROUP BY i.InvestorId, i.Name;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetEmployeeDashboard
+    @EmployeeId INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        e.EmployeeId,
+        e.EmployeeName,
+        (SELECT COUNT(*) FROM Tasks WHERE AssignedTo = e.EmployeeId AND Status != 'COMPLETED') AS TasksAssigned,
+        (SELECT COUNT(*) FROM Tasks WHERE AssignedTo = e.EmployeeId AND Status = 'COMPLETED') AS TasksCompleted,
+        (SELECT COUNT(DISTINCT AttendanceDate) FROM Attendance WHERE EmployeeId = e.EmployeeId AND Status = 'PRESENT') AS AttendanceDays,
+        ISNULL(sal.BaseSalary, 0) AS Salary,
+        ISNULL(SUM(ec.CommissionAmount), 0) AS Commission,
+        0 AS PerformanceScore
+    FROM Employees e
+    LEFT JOIN Salary sal ON e.EmployeeId = sal.EmployeeId AND sal.IsActive = 1
+    LEFT JOIN EmployeeCommission ec ON e.EmployeeId = ec.EmployeeId
+    WHERE @EmployeeId IS NULL OR e.EmployeeId = @EmployeeId
+    GROUP BY e.EmployeeId, e.EmployeeName, sal.BaseSalary;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetChannelAnalytics
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        sc.ChannelName,
+        ISNULL(SUM(so.GrandTotal), 0) AS ChannelRevenue,
+        ISNULL(SUM(so.GrandTotal - ISNULL((SELECT SUM(Qty * UnitPrice) FROM SalesOrderLines WHERE OrderId = so.OrderId), 0)), 0) AS ChannelProfit,
+        CASE WHEN SUM(so.GrandTotal) > 0 THEN (SUM(ms.MarketplaceCommission) / SUM(so.GrandTotal)) * 100 ELSE 0 END AS CommissionPercent,
+        CASE WHEN COUNT(DISTINCT so.OrderId) > 0 THEN (COUNT(sr.ReturnId) * 100.0 / COUNT(DISTINCT so.OrderId)) ELSE 0 END AS ReturnPercent,
+        0 AS PenaltyPercent
+    FROM SalesChannels sc
+    LEFT JOIN SalesOrders so ON sc.ChannelId = so.ChannelId
+    LEFT JOIN MarketplaceSettlements ms ON so.OrderId = ms.OrderId
+    LEFT JOIN SalesReturns sr ON so.OrderId = sr.OrderId
+    GROUP BY sc.ChannelName;
+END;
+GO
 
     INSERT INTO SalesReturnLines
         (ReturnId, OrderLineId, VariantId, Qty, RefundAmount, [Condition], Restock, RestockWarehouseId)

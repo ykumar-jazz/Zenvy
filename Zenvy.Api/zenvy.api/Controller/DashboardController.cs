@@ -4,15 +4,75 @@ using zenvy.application.Interfaces.Services;
 
 namespace zenvy.api.Controller;
 
-[Authorize, ApiController, Route("api/v{version:apiVersion}/dashboard")]
+[Authorize]
+[Route("api/v{version:apiVersion}/dashboards")]
+[ApiController]
 public class DashboardController(IDashboardService service) : ControllerBase
 {
-    [HttpGet("analytics")]
-    public async Task<IActionResult> GetAnalytics([FromQuery] DateTime fromDate, [FromQuery] DateTime toDate, [FromQuery] int lowStockThreshold = 10)
+    /// <summary>
+    /// Get Executive/Admin Dashboard - Overall business health
+    /// </summary>
+    [HttpGet("executive")]
+    public async Task<IActionResult> GetExecutiveDashboard()
     {
-        if (fromDate == default || toDate == default) return BadRequest("fromDate and toDate are required.");
-        if (fromDate > toDate) return BadRequest("fromDate cannot be after toDate.");
-        if (lowStockThreshold < 0) return BadRequest("lowStockThreshold cannot be negative.");
-        return Ok(await service.GetSummaryAsync(fromDate, toDate, lowStockThreshold));
+        var response = await service.GetExecutiveDashboardAsync();
+        if (!response.Success) return BadRequest(response);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get Finance Dashboard - Money management and fund flow
+    /// </summary>
+    [HttpGet("finance")]
+    public async Task<IActionResult> GetFinanceDashboard()
+    {
+        var response = await service.GetFinanceDashboardAsync();
+        if (!response.Success) return BadRequest(response);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get Operations Dashboard - Daily business operations
+    /// </summary>
+    [HttpGet("operations")]
+    public async Task<IActionResult> GetOperationsDashboard()
+    {
+        var response = await service.GetOperationsDashboardAsync();
+        if (!response.Success) return BadRequest(response);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get Marketplace Dashboard - Meesho, Myntra, Amazon tracking
+    /// </summary>
+    [HttpGet("marketplace")]
+    public async Task<IActionResult> GetMarketplaceDashboard()
+    {
+        var response = await service.GetMarketplaceDashboardAsync();
+        if (!response.Success) return BadRequest(response);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get Investor Dashboard - Investment and profit tracking
+    /// </summary>
+    [HttpGet("investor/{investorId:int}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetInvestorDashboard(int investorId)
+    {
+        var response = await service.GetInvestorDashboardAsync(investorId);
+        if (!response.Success) return NotFound(response);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get Employee Dashboard - Task and performance tracking
+    /// </summary>
+    [HttpGet("employee")]
+    public async Task<IActionResult> GetEmployeeDashboard([FromQuery] int? employeeId = null)
+    {
+        var response = await service.GetEmployeeDashboardAsync(employeeId);
+        if (!response.Success) return NotFound(response);
+        return Ok(response);
     }
 }

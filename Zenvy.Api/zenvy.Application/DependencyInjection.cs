@@ -28,6 +28,8 @@ namespace zenvy.application
             services.AddScoped<ICustomerService,CustomerService>();
             services.AddScoped<IPurchaseOrderService,PurchaseOrderService>();
             services.AddScoped<ISalesOrderService,SalesOrderService>();
+            services.AddScoped<ISalesChannelService, SalesChannelService>();
+            services.AddScoped<IMarketplaceSettlementService, MarketplaceSettlementService>();
             services.AddScoped<IReturnService, ReturnService>();
             services.AddScoped<IPaymentService,PaymentService>();
             services.AddScoped<IShipmentService,ShipmentService>();

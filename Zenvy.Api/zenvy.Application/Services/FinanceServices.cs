@@ -99,25 +99,3 @@ public class InvestorService(IInvestorRepository repository, IProfitService prof
     }
     public Task<IEnumerable<ProfitDistributionResponse>> GetDistributionsAsync(short? year, byte? month, int? investorId) => repository.GetDistributionsAsync(year, month, investorId);
 }
-
-public class DashboardService(IDashboardRepository repository, IProfitService profitService) : IDashboardService
-{
-    public async Task<DashboardResponse> GetSummaryAsync(DateTime fromDate, DateTime toDate, int lowStockThreshold)
-    {
-        var dashboardTask = repository.GetSummaryAsync(fromDate, toDate, lowStockThreshold);
-        var profitTask = profitService.GetSummaryAsync(fromDate, toDate);
-        await Task.WhenAll(dashboardTask, profitTask);
-
-        var dashboard = await dashboardTask;
-        var profit = await profitTask;
-        dashboard.Kpis.Revenue = profit.NetSales;
-        dashboard.Kpis.GrossProfit = profit.GrossProfit;
-        dashboard.Kpis.NetProfit = profit.NetProfit;
-        dashboard.Kpis.ProductPurchaseInvestment = profit.ProductPurchaseInvestment;
-        dashboard.Kpis.TotalExpenses = profit.Expenses;
-        dashboard.Kpis.NetMarginPercent = profit.NetMarginPercent;
-        dashboard.Kpis.ReturnOnInvestmentPercent = profit.ReturnOnInvestmentPercent;
-        dashboard.Kpis.UncostedQuantity = profit.UncostedQuantity;
-        return dashboard;
-    }
-}

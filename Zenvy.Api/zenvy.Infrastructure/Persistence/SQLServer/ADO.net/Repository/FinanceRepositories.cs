@@ -210,27 +210,3 @@ public class InvestorRepository(IConfiguration configuration) : IInvestorReposit
         return result;
     }
 }
-
-public class DashboardRepository(IConfiguration configuration) : IDashboardRepository
-{
-    private readonly string connectionString = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
-
-    public async Task<DashboardResponse> GetSummaryAsync(DateTime fromDate, DateTime toDate, int lowStockThreshold)
-    {
-        var result = new DashboardResponse();
-        await using var connection = new SqlConnection(connectionString); await connection.OpenAsync();
-        await using var command = FinanceSql.Command("usp_GetDashboardAnalytics", connection);
-        command.Parameters.AddWithValue("@FromDate", fromDate); command.Parameters.AddWithValue("@ToDate", toDate); command.Parameters.AddWithValue("@LowStockThreshold", lowStockThreshold);
-        await using var reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync()) result.Kpis = new DashboardKpis
-        {
-            OrderCount = reader.GetInt32(reader.GetOrdinal("OrderCount")), AverageOrderValue = reader.GetDecimal(reader.GetOrdinal("AverageOrderValue")),
-            LowStockCount = reader.GetInt32(reader.GetOrdinal("LowStockCount"))
-        };
-        await reader.NextResultAsync(); while (await reader.ReadAsync()) result.SalesTrend.Add(new SalesTrendPoint { Period = reader.GetDateTime(reader.GetOrdinal("Period")), Revenue = reader.GetDecimal(reader.GetOrdinal("Revenue")), OrderCount = reader.GetInt32(reader.GetOrdinal("OrderCount")), AverageOrderValue = reader.GetDecimal(reader.GetOrdinal("AverageOrderValue")) });
-        await reader.NextResultAsync(); while (await reader.ReadAsync()) result.TopProducts.Add(new TopProductItem { VariantId = reader.GetInt32(reader.GetOrdinal("VariantId")), ProductName = reader.GetString(reader.GetOrdinal("ProductName")), SKU = reader.GetString(reader.GetOrdinal("SKU")), QuantitySold = reader.GetInt32(reader.GetOrdinal("QuantitySold")), Revenue = reader.GetDecimal(reader.GetOrdinal("Revenue")) });
-        await reader.NextResultAsync(); while (await reader.ReadAsync()) result.ExpenseBreakdown.Add(new ExpenseBreakdownItem { ExpenseTypeId = reader.GetInt32(reader.GetOrdinal("ExpenseTypeId")), ExpenseTypeName = reader.GetString(reader.GetOrdinal("ExpenseTypeName")), Amount = reader.GetDecimal(reader.GetOrdinal("Amount")) });
-        await reader.NextResultAsync(); while (await reader.ReadAsync()) result.LowStockItems.Add(new LowStockItem { VariantId = reader.GetInt32(reader.GetOrdinal("VariantId")), ProductName = reader.GetString(reader.GetOrdinal("ProductName")), SKU = reader.GetString(reader.GetOrdinal("SKU")), WarehouseId = reader.GetInt32(reader.GetOrdinal("WarehouseId")), WarehouseName = reader.GetString(reader.GetOrdinal("WarehouseName")), AvailableQty = reader.GetInt32(reader.GetOrdinal("AvailableQty")) });
-        return result;
-    }
-}
